@@ -5,6 +5,7 @@ import logger from "../utils/logger";
 import validateResource from "../middleware/validateResource";
 import { createSession } from "../service/sessionService";
 import { createUserSessionHandler } from "./sessionController";
+import UserModel from "../models/user.model";
 
 export async function createOrGetUserHandler(req:Request<{}, {}, CreateUserInput["body"]>, res:Response) {
     try {
@@ -33,3 +34,17 @@ export async function createOrGetUserHandler(req:Request<{}, {}, CreateUserInput
         return res.status(409).send(error.message);
     }
 }
+
+export async function getAllUsershandler(req:Request, res:Response) {
+    try {
+        const users = await UserModel.find({});
+    
+        // setTimeout(() => {
+        //   return res.send({ status: 200, users });
+        // }, 60000);
+        return res.send({ status: 200, users });
+      } catch (error) {
+        console.error('Error fetching users:', error);
+        return res.status(500).send({ status: 500, message: 'Internal Server Error' });
+      }
+    }

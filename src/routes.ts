@@ -3,7 +3,7 @@ import { createCategorytHandler, getCategoriesHandler } from "./controller/categ
 import { cancelOrderHandler, createOrdertHandler, getOrderByIdHandler, getOrdersByUserIdHandler, updateOrdertHandler } from "./controller/order.controller";
 import { createProductHandler, getProductByCategoryHandler, getProductByIdHandler, getProductHandler } from "./controller/product.controller";
 import { deleteSessionHandler, getUserSessionsHandler } from "./controller/sessionController";
-import { createOrGetUserHandler } from "./controller/user.controller";
+import { createOrGetUserHandler, getAllUsershandler } from "./controller/user.controller";
 import requireUser from "./middleware/requireUser";
 
 function routes(app: Express) {
@@ -14,6 +14,7 @@ function routes(app: Express) {
 
     //Users
     app.post("/api/users", createOrGetUserHandler) // create or get existing user with referesh token // login
+    app.get("/api/users", getAllUsershandler)
 
     // Session
     app.get("/api/sessions", getUserSessionsHandler) // get active user sessions
