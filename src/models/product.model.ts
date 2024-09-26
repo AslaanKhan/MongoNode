@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import { UserDocument } from "./user.model";
 
 export interface ProductDocument extends mongoose.Document {
     title: string,
@@ -17,7 +16,7 @@ const ProductSchema = new mongoose.Schema({
     price: { type: Number, required: true },
     description: { type: String, required: true },
     image: { type: [String] },
-    category: { type: [String], required: true },
+    category: { type: mongoose.Schema.Types.ObjectId, ref: "categories", required: true },
     isAvailable: { type: Boolean, default: true },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },

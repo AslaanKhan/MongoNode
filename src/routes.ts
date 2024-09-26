@@ -1,6 +1,7 @@
 import { Express, Request, Response } from "express";
+import { createCategorytHandler, getCategoriesHandler } from "./controller/category.controller";
 import { cancelOrderHandler, createOrdertHandler, getOrderByIdHandler, getOrdersByUserIdHandler, updateOrdertHandler } from "./controller/order.controller";
-import { createProductHandler, getProductByIdHandler, getProductHandler } from "./controller/product.controller";
+import { createProductHandler, getProductByCategoryHandler, getProductByIdHandler, getProductHandler } from "./controller/product.controller";
 import { deleteSessionHandler, getUserSessionsHandler } from "./controller/sessionController";
 import { createOrGetUserHandler } from "./controller/user.controller";
 import requireUser from "./middleware/requireUser";
@@ -22,9 +23,11 @@ function routes(app: Express) {
     app.post("/api/products", requireUser, createProductHandler) // create products
     app.get("/api/products", getProductHandler) // get all products
     app.get("/api/products/:productId", getProductByIdHandler) // get product by id
+    app.get("/api/productsByCategory/:categoryId", getProductByCategoryHandler) // get product by id
 
     //Categories
-
+    app.get("/api/categories", getCategoriesHandler)
+    app.post("/api/categories", createCategorytHandler)
 
     //orders
     app.post("/api/order", requireUser, createOrdertHandler) // create order

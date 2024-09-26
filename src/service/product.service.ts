@@ -14,6 +14,13 @@ export async function getProduct(
     return ProductModel.findOne(query, {}, options);
 }
 
+export async function getProductByCategory(
+    query: FilterQuery<ProductDocument>,
+    options: QueryOptions = { lean: true }
+) {
+    return ProductModel.find(query, {}, options);
+}
+
 export async function getAllProducts() {
     return await ProductModel.find({})
 }

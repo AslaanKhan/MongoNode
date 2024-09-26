@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import UserModel from "../models/user.model";
 import { CreateProductInput, UpdateProductInput } from "../schema/product.schema";
-import { createProduct, deleteProduct, getAllProducts, getProduct, updateProduct } from "../service/product.service";
+import { createProduct, deleteProduct, getAllProducts, getProduct, getProductByCategory, updateProduct } from "../service/product.service";
 
 export async function createProductHandler(req: Request<{}, {}, CreateProductInput["body"]>, res:Response) { 
     const body = req.body
@@ -42,6 +42,13 @@ export async function getProductByIdHandler(req: Request, res:Response) {
     const products = await getProduct({productId})
     return res.send({ status:"200", product: products })
 }
+
+export async function getProductByCategoryHandler(req: Request, res:Response) {
+    const categoryId = req.params.categoryId
+    const products = await getProductByCategory({category: categoryId})
+    return res.send({ status:"200", product: products })
+}
+
 
 export async function deleteProductHandler(req: Request, res:Response) {
     const user = await UserModel.findOne({_id: res.locals.user._doc._id})
