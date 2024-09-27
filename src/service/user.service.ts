@@ -10,9 +10,13 @@ export async function createUser(input: any) {
     }
 }
 
-export async function getUser(query: FilterQuery<UserDocument>) {
+// export async function getUser(query: FilterQuery<UserDocument>) {
+//     return UserModel.findOne(query).lean();
+//   }
+
+export async function getUserById(query: FilterQuery<UserDocument>) {
     return UserModel.findOne(query).lean();
-  }
+}
 
 export async function updateUser(query: FilterQuery<UserDocument>,
     update: UpdateQuery<UserDocument>,
