@@ -1,10 +1,12 @@
 import { Express, Request, Response } from "express";
-import { createCategorytHandler, getCategoriesHandler } from "./controller/category.controller";
+import { createCategorytHandler, deleteCategoryHandler, getCategoriesHandler, updateCategoriesHandler } from "./controller/category.controller";
 import { cancelOrderHandler, createOrdertHandler, getOrderByIdHandler, getOrdersByUserIdHandler, updateOrdertHandler } from "./controller/order.controller";
-import { createProductHandler, getProductByCategoryHandler, getProductByIdHandler, getProductHandler } from "./controller/product.controller";
+import { createProductHandler, deleteProductHandler, getProductByCategoryHandler, getProductByIdHandler, getProductHandler, updateProductHandler } from "./controller/product.controller";
 import { deleteSessionHandler, getUserSessionsHandler } from "./controller/sessionController";
 import { createOrGetUserHandler, getAllUsershandler, getUserByIdHandler } from "./controller/user.controller";
 import requireUser from "./middleware/requireUser";
+import validateResource from "./middleware/validateResource";
+import { createProductSchema, updateProductSchema, updateStockSchema } from "./schema/product.schema";
 
 function routes(app: Express) {
 
@@ -22,14 +24,19 @@ function routes(app: Express) {
     app.delete("/api/sessions",requireUser, deleteSessionHandler) // log out user
 
     // Products 
-    app.post("/api/products", requireUser, createProductHandler) // create products
+    app.post("/api/products",validateResource(createProductSchema), createProductHandler) // create products
+    app.post("/api/products/:productId",validateResource(updateProductSchema), updateProductHandler) // update products
+    app.post("/api/product/:productId",validateResource(updateStockSchema), updateProductHandler) // update stock
     app.get("/api/products", getProductHandler) // get all products
     app.get("/api/products/:productId", getProductByIdHandler) // get product by id
-    app.get("/api/productsByCategory/:categoryId", getProductByCategoryHandler) // get product by id
+    app.get("/api/productsByCategory/:categoryId", getProductByCategoryHandler) // get product by category
+    app.delete("/api/products/:productId", deleteProductHandler) // get product by category
 
     //Categories
     app.get("/api/categories", getCategoriesHandler)
     app.post("/api/categories", createCategorytHandler)
+    app.post("/api/categories/:categoryId", updateCategoriesHandler)
+    app.delete("/api/categories/:categoryId", deleteCategoryHandler)
 
     //orders
     app.post("/api/order", requireUser, createOrdertHandler) // create order

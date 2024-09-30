@@ -5,31 +5,34 @@ import { createProduct, deleteProduct, getAllProducts, getProduct, getProductByC
 
 export async function createProductHandler(req: Request<{}, {}, CreateProductInput["body"]>, res:Response) { 
     const body = req.body
-    const user = await UserModel.findOne({_id: res.locals.user._doc._id})
-    if(!user?.isAdmin){
-        return res.send({ status:200, message:"User not admin" })
+    const user = await UserModel.findOne({_id: res?.locals?.user?._doc?._id})
+    // if(!user?.isAdmin){
+    //     return res.send({ status:200, message:"User not admin" })
+    // }
+    try {
+        const product = await createProduct(body)
+        return res.send({status:"200", message:"Product Created", product}) 
+    } catch (error) {
+        return res.send({status:"200", message:"Something went wrong" , error})
     }
-    
-    await createProduct(body)
-    return res.send({status:"200", message:"Product Created"}) 
 }
 
 export async function updateProductHandler(req: Request<UpdateProductInput["params"], UpdateProductInput["body"]>, res:Response) {
-    const user = await UserModel.findOne({_id: res.locals.user._doc._id})
+    const user = await UserModel.findOne({_id: res?.locals.user?._doc?._id})
     const productId = req.params.productId
     const update = req.body    
-    const product = await getProduct({productId})
+    const productExist = await getProduct({_id:productId})
     
-    if(!product){
+    if(!productExist){
         return res.sendStatus(404)
     }
     
-    if(!user?.isAdmin){
-        return res.status(403).send({ message:"User not admin" })
-    }
+    // if(!user?.isAdmin){
+    //     return res.status(403).send({ message:"User not admin" })
+    // }
 
-    await updateProduct({productId}, update, { new: true })
-    return res.send({status:'200', message:"Product Updated"})
+    const product = await updateProduct({_id:productId}, update, { new: true })
+    return res.send({status:'200', message:"Product Updated", product})
 }
 
 export async function getProductHandler(req: Request, res:Response) {
@@ -39,30 +42,30 @@ export async function getProductHandler(req: Request, res:Response) {
 
 export async function getProductByIdHandler(req: Request, res:Response) {
     const productId = req.params.productId
-    const products = await getProduct({productId})
+    const products = await getProduct({_id:productId})
     return res.send({ status:"200", product: products })
 }
 
 export async function getProductByCategoryHandler(req: Request, res:Response) {
     const categoryId = req.params.categoryId
-    const products = await getProductByCategory({category: categoryId})
+    const products = await getProductByCategory({ 'category.id': categoryId })
     return res.send({ status:"200", product: products })
 }
 
 
 export async function deleteProductHandler(req: Request, res:Response) {
-    const user = await UserModel.findOne({_id: res.locals.user._doc._id})
+    const user = await UserModel.findOne({_id: res?.locals?.user?._doc?._id})
     const productId = req.params.productId
-    const product = await getProduct({productId})
+    const product = await getProduct({_id:productId})
     
     if(!product){
-        return res.sendStatus(404)
+        return res.send({status:"200", message:"Product not found"})
     }
     
-    if(!user?.isAdmin){
-        return res.status(403).send({ message:"User not admin" })
-    }
+    // if(!user?.isAdmin){
+    //     return res.status(403).send({ message:"User not admin" })
+    // }
 
-    await deleteProduct({productId})
+    await deleteProduct({_id: productId})
     return res.send({status:"200", message:"Product deleted "})
 }

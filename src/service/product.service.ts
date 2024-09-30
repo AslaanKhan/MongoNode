@@ -4,7 +4,12 @@ import ProductModel, { ProductDocument } from "../models/product.model";
 
 
 export async function createProduct(product: any) {
-    return await ProductModel.create(product);
+    try {
+        return await ProductModel.create(product);
+    } catch (error) {
+        console.log(error)
+        return error
+    }
 }
 
 export async function getProduct(

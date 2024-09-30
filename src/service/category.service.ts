@@ -1,35 +1,45 @@
-import { Response } from "express";
 import { FilterQuery, QueryOptions, UpdateQuery } from "mongoose";
-import CategoryModel from "../models/category.model";
+import CategoryModel, { CategoryDocument } from "../models/category.model";
 import OrderModel from "../models/order.model";
-import { ProductDocument } from "../models/product.model";
+import ProductModel, { ProductDocument } from "../models/product.model";
 
 
 export async function createCategory(Category: any) {
-    return await CategoryModel.create(Category);
+    return await CategoryModel.create({name:Category, isAvailable: true});
 }
 
-export async function getOrder(
-    query: FilterQuery<ProductDocument>,
+export async function getCategory(
+    query: FilterQuery<CategoryDocument>,
     options: QueryOptions = { lean: true }
 ) {
-    return OrderModel.findOne(query, {}, options);
+    return CategoryModel.findOne(query, {}, options);
 }
 
 export async function getCategories() {
     return await CategoryModel.find({})
 }
 
-export async function updateOrder(
-    query: FilterQuery<ProductDocument>,
-    update: UpdateQuery<ProductDocument>,
+export async function updateCategory(
+    query: FilterQuery<CategoryDocument>,
+    update: UpdateQuery<CategoryDocument>,
     options: QueryOptions = { lean: true }
-) {
-    return OrderModel.findOneAndUpdate(query, update, options);
+)  {
+    // Update the category
+    const updatedCategory = await CategoryModel.findOneAndUpdate(query, update, options);
+
+    // If the category was updated, reflect this change in related products
+    if (updatedCategory) {
+        await ProductModel.updateMany(
+            { 'category.id': updatedCategory._id },
+            { $set: { 'category.name': updatedCategory.name, 'isAvailable': updatedCategory?.isAvailable  } },
+        );
+    }
+
+    return updatedCategory;
 }
 
 export async function deleteCategory(
-    query: FilterQuery<ProductDocument>,
+    query: FilterQuery<CategoryDocument>,
 ) {
     return CategoryModel.findOneAndDelete(query);
 }

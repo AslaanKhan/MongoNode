@@ -1,8 +1,8 @@
-import { array, number, object, string, TypeOf } from "zod"
+import { boolean, object, string, TypeOf } from "zod"
 
 const payload = {
     body: object({
-        name: string()
+        name: string(),
     })
 }
 
