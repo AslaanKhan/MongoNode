@@ -15,6 +15,10 @@ export async function getOrder(
     return OrderModel.findOne(query, {}, options);
 }
 
+export async function getOrders() {
+    return OrderModel.find();
+}
+
 export async function getOrdersByUserId(res: Response) {
     return await OrderModel.find({}).where("user").equals(res.locals.user._doc._id);
 }

@@ -5,30 +5,31 @@ export interface Category {
     id: string;
 }
 
-
 export interface ProductDocument extends mongoose.Document {
-    title: string,
-    price: number,
-    description: string,
-    image: { path: string }[], // Update the type to reflect the new structure
-    category: Category,
-    isAvailable: boolean,
-    createdAt: Date,
-    updatedAt: Date,
+    title: string;
+    price: number;
+    description: string;
+    image: { path: string }[];
+    category: Category;
+    isAvailable: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+    offerIds?: mongoose.Schema.Types.ObjectId[]; // Array of offer IDs
 }
 
 const ProductSchema = new mongoose.Schema({
     title: { type: String, required: true },
     price: { type: Number, required: true },
     description: { type: String, required: true },
-    image: [{ path: { type: String } }], // Update the image field to store an array of objects
-    category: { 
-        name: { type: String, required: true }, // Name of the category
-        id: { type: mongoose.Schema.Types.ObjectId, ref: "Category", required: true } // ObjectId reference for the category
+    image: [{ path: { type: String } }],
+    category: {
+        name: { type: String, required: true },
+        id: { type: mongoose.Schema.Types.ObjectId, ref: "Category", required: true },
     },
     isAvailable: { type: Boolean, default: true },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
+    offerIds: [{ type: mongoose.Schema.Types.ObjectId, ref: "Offers" }], // Store references to offers
 });
 
 // Middleware to update updatedAt field before saving

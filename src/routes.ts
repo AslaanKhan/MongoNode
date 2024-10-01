@@ -3,10 +3,11 @@ import { createCategorytHandler, deleteCategoryHandler, getCategoriesHandler, up
 import { cancelOrderHandler, createOrdertHandler, getOrderByIdHandler, getOrdersByUserIdHandler, updateOrdertHandler } from "./controller/order.controller";
 import { createProductHandler, deleteProductHandler, getProductByCategoryHandler, getProductByIdHandler, getProductHandler, updateProductHandler } from "./controller/product.controller";
 import { deleteSessionHandler, getUserSessionsHandler } from "./controller/sessionController";
-import { createOrGetUserHandler, getAllUsershandler, getUserByIdHandler } from "./controller/user.controller";
+import { adminLoginHandler, createOrGetUserHandler, getAllUsershandler, getUserByIdHandler } from "./controller/user.controller";
 import requireUser from "./middleware/requireUser";
 import validateResource from "./middleware/validateResource";
 import { createProductSchema, updateProductSchema, updateStockSchema } from "./schema/product.schema";
+import { createOfferHandler, getOffersHandler } from "./controller/offer.controller";
 
 function routes(app: Express) {
 
@@ -16,6 +17,7 @@ function routes(app: Express) {
 
     //Users
     app.post("/api/users", createOrGetUserHandler) // create or get existing user with referesh token // login
+    app.get("/api/admin/:id", adminLoginHandler) // create or get existing user with referesh token // login
     app.get("/api/users", getAllUsershandler)
     app.get("/api/users/:id", getUserByIdHandler)
 
@@ -41,12 +43,14 @@ function routes(app: Express) {
     //orders
     app.post("/api/order", requireUser, createOrdertHandler) // create order
     app.post("/api/updateorder", requireUser, updateOrdertHandler) // update order
-    app.get("/api/order", requireUser, getOrdersByUserIdHandler) // get all user order
+    app.get("/api/order", getOrdersByUserIdHandler) // get all user order
     app.get("/api/order/:orderId", requireUser, getOrderByIdHandler) // get order by id
     app.delete("/api/order/:orderId", requireUser, cancelOrderHandler) // cancel order
     
 
-    //
+    //offers
+    app.post("/api/offers", createOfferHandler)
+    app.get("/api/offers", getOffersHandler)
 
 
  }

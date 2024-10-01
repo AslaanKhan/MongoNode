@@ -14,7 +14,7 @@ export async function createUser(input: any) {
 //     return UserModel.findOne(query).lean();
 //   }
 
-export async function getUserById(query: FilterQuery<UserDocument>) {
+export async function getUserByParam(query: FilterQuery<UserDocument>) {
     return UserModel.findOne(query).lean();
 }
 

@@ -4,9 +4,8 @@ import { signJwt } from "../utils/jwt.utils";
 import { createSession, findSessions, updateSession } from "../service/sessionService";
 import UserModel from "../models/user.model";
 
-export async function createUserSessionHandler(req: Request, res: Response) {
+export async function createUserSessionHandler(req: Request, res: Response, user: any) {
   // Validate the user's password
-  const user = await UserModel.findOne({ number: req.body.number });
 
   if (!user) {
     return res.status(401).send("number");
@@ -22,17 +21,9 @@ export async function createUserSessionHandler(req: Request, res: Response) {
     "accessTokenPrivateKey",
     { expiresIn: config.get("accessTokenTtl") } // 1yr,
   );
-
-  // create a refresh token
-  const refreshToken = signJwt(
-    { ...user, session: session._id },
-    "refreshTokenPrivateKey",
-    { expiresIn: config.get("refreshTokenTtl") } // 1yr
-  );
-
   // return access & refresh tokens
 
-  return { accessToken, refreshToken };
+  return accessToken ;
 }
 
 export async function getUserSessionsHandler(req: Request, res: Response) {

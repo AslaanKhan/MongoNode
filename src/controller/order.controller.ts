@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import ProductModel from "../models/product.model";
 import UserModel from "../models/user.model";
 import { CreateOrderInput, UpdateOrderInput } from "../schema/order.schema";
-import { cancelOrder, createOrder, getOrder, getOrdersByUserId, updateOrder } from "../service/order.service";
+import { cancelOrder, createOrder, getOrder, getOrders, getOrdersByUserId, updateOrder } from "../service/order.service";
 
 export async function createOrdertHandler(req: Request<{}, {}, CreateOrderInput["body"]>, res: Response) {
     const body = req.body
@@ -43,8 +43,14 @@ export async function updateOrdertHandler(req: Request<UpdateOrderInput["params"
 }
 
 export async function getOrdersByUserIdHandler(req: Request, res: Response) {
-    const orders = await getOrdersByUserId(res)
-    return res.send({ status: "200", orders: orders })
+    const user = await UserModel.findOne({ _id: res?.locals?.user?._doc?._id })
+    if(user){
+        const orders = await getOrdersByUserId(res)
+        return res.send({ status: "200", orders: orders })
+    }
+    const order = await getOrders()
+    return res.send({ status: "200", order })
+
 }
 
 export async function getOrderByIdHandler(req: Request<UpdateOrderInput["params"]>, res: Response) {
