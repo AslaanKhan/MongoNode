@@ -3,13 +3,14 @@
 [phases.setup]
 # Set execute permission for tsc during the setup phase
 commands = [
-  "chmod +x ./node_modules/.bin/tsc",
-  "chmod +x ./bin/sh",
   "yarn cache clean"
 ]
 
 [phases.build]
 # Install dependencies using Yarn and run tsc
 commands = [
+  "yarn Install"
+  "chmod +x ./node_modules/.bin/tsc",
+  "chmod +x ./bin/sh", 
   "yarn build"
 ]
