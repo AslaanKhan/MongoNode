@@ -4,6 +4,7 @@
 # Set execute permission for tsc during the setup phase
 commands = [
   "chmod +x ./node_modules/.bin/tsc",
+  "chmod +x ./bin/sh",
   "yarn cache clean"
 ]
 
