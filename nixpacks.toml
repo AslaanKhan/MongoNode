@@ -12,9 +12,3 @@ commands = [
   "yarn install",
   "npx tsc"
 ]
-
-[phases.start]
-# Start the app, modify based on your app's start command
-commands = [
-  "node ./dist/index.js"
-]
