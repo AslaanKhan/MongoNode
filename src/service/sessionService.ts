@@ -1,9 +1,9 @@
-import { get } from "lodash";
 import config from "config";
+import { get } from "lodash";
 import { FilterQuery, UpdateQuery } from "mongoose";
 import SessionModel, { SessionDocument } from "../models/session.model";
-import { verifyJwt, signJwt } from "../utils/jwt.utils";
-import { getUser } from "./user.service";
+import { signJwt, verifyJwt } from "../utils/jwt.utils";
+import { getUserByParam } from "./user.service";
 
 export async function createSession(userId: object, userAgent: string) {
   const existingSessions = await findSessions({ user: userId, valid: true });
@@ -43,7 +43,7 @@ export async function reIssueAccessToken({
 
   if (!session || !session.valid) return false;
 
-  const user = await getUser({ _id: session.user });
+  const user = await getUserByParam({ _id: session.user });
 
   if (!user) return false;
 
