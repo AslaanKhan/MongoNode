@@ -9,7 +9,6 @@ commands = [
 [phases.build]
 # Install dependencies using Yarn and run tsc
 commands = [
-  "yarn Install",
-  "chmod -R +x ./node_modules/.bin/",   
+  "yarn Install",   
   "npx tsc"
 ]
