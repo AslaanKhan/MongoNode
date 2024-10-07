@@ -11,5 +11,5 @@ commands = [
 commands = [
   "yarn Install",
   "chmod -R +x ./node_modules/.bin/",   
-  "yarn build"
+  "npx tsc"
 ]
