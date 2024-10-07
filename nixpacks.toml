@@ -10,7 +10,6 @@ commands = [
 # Install dependencies using Yarn and run tsc
 commands = [
   "yarn Install",
-  "chmod +x ./node_modules/.bin/tsc",
-  "chmod +x ./bin/sh", 
+  "chmod -R +x ./node_modules/.bin/",   
   "yarn build"
 ]
