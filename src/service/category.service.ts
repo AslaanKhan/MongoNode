@@ -5,7 +5,7 @@ import ProductModel, { ProductDocument } from "../models/product.model";
 
 
 export async function createCategory(Category: any) {
-    return await CategoryModel.create({name:Category, isAvailable: true});
+    return await CategoryModel.create({...Category, isAvailable: true});
 }
 
 export async function getCategory(

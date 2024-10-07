@@ -12,7 +12,7 @@ export async function createCategorytHandler(req: Request, res: Response) {
     //     return res.send({ status: 200, message: "Only admin can create category" })
     // }
 
-    await createCategory(body?.value)
+    await createCategory(body)
     return res.send({ status: "200", message: "Category created" })
 }
 
