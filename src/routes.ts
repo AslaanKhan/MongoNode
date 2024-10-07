@@ -1,5 +1,6 @@
 import { Express, Request, Response } from "express";
 import { createCategorytHandler, deleteCategoryHandler, getCategoriesHandler, updateCategoriesHandler } from "./controller/category.controller";
+import { createOfferHandler, getAllOffersHandler, getOfferByIdHandler, updateOfferByIdHandler } from "./controller/offer.controller";
 import { cancelOrderHandler, createOrdertHandler, getOrderByIdHandler, getOrdersByUserIdHandler, updateOrdertHandler } from "./controller/order.controller";
 import { createProductHandler, deleteProductHandler, getProductByCategoryHandler, getProductByIdHandler, getProductHandler, updateProductHandler } from "./controller/product.controller";
 import { deleteSessionHandler, getUserSessionsHandler } from "./controller/sessionController";
@@ -7,7 +8,6 @@ import { adminLoginHandler, createOrGetUserHandler, getAllUsershandler, getUserB
 import requireUser from "./middleware/requireUser";
 import validateResource from "./middleware/validateResource";
 import { createProductSchema, updateProductSchema, updateStockSchema } from "./schema/product.schema";
-import { createOfferHandler, getOffersHandler } from "./controller/offer.controller";
 
 function routes(app: Express) {
 
@@ -50,7 +50,9 @@ function routes(app: Express) {
 
     //offers
     app.post("/api/offers", createOfferHandler)
-    app.get("/api/offers", getOffersHandler)
+    app.post("/api/offers/:offerId", updateOfferByIdHandler)
+    app.get("/api/offers", getAllOffersHandler)
+    app.get("/api/offers/:offerId", getOfferByIdHandler)
 
 
  }

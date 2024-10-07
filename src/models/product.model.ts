@@ -14,7 +14,7 @@ export interface ProductDocument extends mongoose.Document {
     isAvailable: boolean;
     createdAt: Date;
     updatedAt: Date;
-    offerIds?: mongoose.Schema.Types.ObjectId[]; // Array of offer IDs
+    offers?: mongoose.Schema.Types.ObjectId[]; // Array of offer IDs
 }
 
 const ProductSchema = new mongoose.Schema({
@@ -29,7 +29,7 @@ const ProductSchema = new mongoose.Schema({
     isAvailable: { type: Boolean, default: true },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
-    offerIds: [{ type: mongoose.Schema.Types.ObjectId, ref: "Offers" }], // Store references to offers
+    offers: [{ type: mongoose.Schema.Types.ObjectId, ref: "Offers" }], // Store references to offers
 });
 
 // Middleware to update updatedAt field before saving
