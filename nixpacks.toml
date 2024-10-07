@@ -9,6 +9,6 @@ commands = [
 [phases.build]
 # Install dependencies using Yarn and run tsc
 commands = [
-  "yarn install",
+  "yarn install --no-cache",
   "npx tsc"
 ]
