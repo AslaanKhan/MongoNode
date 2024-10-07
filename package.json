@@ -1,14 +1,14 @@
 {
-  "name": "node-mongo",
+  "name": "salman_kirana-backend",
   "version": "1.0.0",
-  "description": "Learning MongoDB",
+  "description": "salman_kirana-backend",
   "main": "index.ts",
   "repository": "https://github.com/AslaanKhan/MongoNode.git",
   "author": "Arsalaan Khan <arslaan.tech@gmail.com>",
   "license": "MIT",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
-    "build": "npx tsc",
+    "build": "tsc",
     "start": "node dist/app.js"
   },
   "dependencies": {

@@ -19,4 +19,4 @@ RUN chmod -R +x ./node_modules/.bin/
 RUN yarn build
 
 # Start the application (adjust according to your entry point)
-CMD ["node", "./dist/index.js"]
+CMD ["node", "./dist/app.js"]
