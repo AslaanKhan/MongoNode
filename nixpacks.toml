@@ -1,0 +1,20 @@
+# nixpacks.toml
+
+[phases.setup]
+# Set execute permission for tsc during the setup phase
+commands = [
+  "chmod +x ./node_modules/.bin/tsc"
+]
+
+[phases.build]
+# Install dependencies using Yarn and run tsc
+commands = [
+  "yarn install",
+  "npx tsc"
+]
+
+[phases.start]
+# Start the app, modify based on your app's start command
+commands = [
+  "node ./dist/index.js"
+]
