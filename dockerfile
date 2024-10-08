@@ -1,24 +1,16 @@
-# Start from the official Node.js image
-FROM node:18 AS base
+FROM node:16
 
-# Set the working directory
 WORKDIR /app
 
-# Install dependencies
+# Copy package.json and yarn.lock first to leverage Docker cache
 COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile
+RUN yarn install --frozen-lockfile --production=false
 
-# Copy the rest of your application files
+# Copy the rest of your application code
 COPY . .
+# Change permissions if necessary
+RUN chmod +x node_modules/.bin/tsc
 
-# Switch to root user
-USER root
+RUN yarn run build
 
-# Install TypeScript globally
-RUN yarn global add typescript
-
-# Build the application
-RUN yarn build
-
-# Specify the command to run your application
-CMD ["node", "dist/app.js"]
+CMD ["node", "dist/app.js"]  # Adjust based on your entry point
