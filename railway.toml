@@ -1,0 +1,7 @@
+{
+  "build": {
+    "dockerfile": "Dockerfile",  // Specify your Dockerfile if needed
+    "buildCommand": "yarn install && yarn build",  // Command to install and build your project
+    "startCommand": "node dist/app.js"  // Command to start your application
+  }
+}
