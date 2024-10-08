@@ -1,7 +1,4 @@
-{
-  build: {
-    dockerfile: "Dockerfile", 
-    buildCommand: "yarn install && yarn build",
-    startCommand: "node dist/app.js" 
-  }
-}
+[build]
+dockerfile = "Dockerfile"         # Path to your Dockerfile
+build_command = "yarn install && yarn build"  # Command to build your app
+start_command = "node dist/app.js" # Command to start your app
