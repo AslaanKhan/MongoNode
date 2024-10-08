@@ -6,7 +6,7 @@ version = 1
 # Define the services for your project
 [services]
 
-# Service for the salman_kirana-backend application
+# Define the service for the salman_kirana-backend application
 [[services]]
   name = "salman_kirana-backend"  # Your service name
   
