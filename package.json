@@ -8,7 +8,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
-    "build": "RUN chmod -R 755 node_modules/.bin && npx tsc",
+    "build": "npx tsc",
     "start": "node dist/app.js"
   },
   "dependencies": {
