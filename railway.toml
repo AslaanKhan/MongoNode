@@ -1,4 +1,4 @@
 [build]
-# Specify the builder type, e.g., NIXPACKS, DOCKERFILE, HEROKU, PAKETO
 builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
+buildCommand = "yarn install --frozen-lockfile && yarn build"
