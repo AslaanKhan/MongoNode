@@ -3,11 +3,8 @@
 # Define the version of the Railway project
 version = 1
 
-# Define the services for your project
-[services]
-
 # Define the service for the salman_kirana-backend application
-[[services]]
+[services]
   name = "salman_kirana-backend"  # Your service name
   
   environment = "node"  # Specify the environment type as Node.js
@@ -15,7 +12,3 @@ version = 1
   # Define the commands to build and start your application
   build = "yarn install && yarn build"  # Install dependencies and build your TypeScript project
   start = "node dist/app.js"  # Command to start your application
-
-  # Optionally, specify environment variables
-  [services.env]
-  NODE_ENV = "production"  # Set the environment variable for production
