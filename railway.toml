@@ -1,14 +1,4 @@
-# railway.toml
-
-# Define the version of the Railway project
-version = 1
-
-# Define the service for the salman_kirana-backend application
-[services]
-  name = "salman_kirana-backend"  # Your service name
-  
-  environment = "node"  # Specify the environment type as Node.js
-
-  # Define the commands to build and start your application
-  build = "yarn install && yarn build"  # Install dependencies and build your TypeScript project
-  start = "node dist/app.js"  # Command to start your application
+[build]
+# Specify the builder type, e.g., NIXPACKS, DOCKERFILE, HEROKU, PAKETO
+builder = "DOCKERFILE"
+dockerfilePath = "dockerfile"
