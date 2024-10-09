@@ -1,5 +1,6 @@
 import { Express, Request, Response } from "express";
 import { createCategorytHandler, deleteCategoryHandler, getCategoriesHandler, updateCategoriesHandler } from "./controller/category.controller";
+import { getMetricsHandler } from "./controller/metrics.controller";
 import { createOfferHandler, getAllOffersHandler, getOfferByIdHandler, updateOfferByIdHandler } from "./controller/offer.controller";
 import { cancelOrderHandler, createOrdertHandler, getOrderByIdHandler, getOrdersByUserIdHandler, updateOrdertHandler } from "./controller/order.controller";
 import { createProductHandler, deleteProductHandler, getProductByCategoryHandler, getProductByIdHandler, getProductHandler, updateProductHandler } from "./controller/product.controller";
@@ -41,7 +42,7 @@ function routes(app: Express) {
     app.delete("/api/categories/:categoryId", deleteCategoryHandler)
 
     //orders
-    app.post("/api/order", requireUser, createOrdertHandler) // create order
+    app.post("/api/order", createOrdertHandler) // create order
     app.post("/api/updateorder", requireUser, updateOrdertHandler) // update order
     app.get("/api/order", getOrdersByUserIdHandler) // get all user order
     app.get("/api/order/:orderId", requireUser, getOrderByIdHandler) // get order by id
@@ -53,6 +54,10 @@ function routes(app: Express) {
     app.post("/api/offers/:offerId", updateOfferByIdHandler)
     app.get("/api/offers", getAllOffersHandler)
     app.get("/api/offers/:offerId", getOfferByIdHandler)
+
+    //metrics
+    app.get("/api/metrics", getMetricsHandler);
+
 
 
  }

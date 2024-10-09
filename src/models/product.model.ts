@@ -6,15 +6,21 @@ export interface Category {
 }
 
 export interface ProductDocument extends mongoose.Document {
-    title: string;
+    title: string; // Default language (e.g., English)
     price: number;
-    description: string;
+    description: string; // Default language (e.g., English)
     image: { path: string }[];
     category: Category;
     isAvailable: boolean;
     createdAt: Date;
     updatedAt: Date;
-    offers?: mongoose.Schema.Types.ObjectId[]; // Array of offer IDs
+    offers?: mongoose.Schema.Types.ObjectId[];
+    translations: {
+        hi?: {
+            title: string;
+            description: string;
+        };
+    };
 }
 
 const ProductSchema = new mongoose.Schema({
@@ -30,10 +36,21 @@ const ProductSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
     offers: [{ type: mongoose.Schema.Types.ObjectId, ref: "Offers" }], // Store references to offers
+
+    translations: {
+        hi: {
+            title: { type: String, required: false },  // Optional field for Hindi title
+            description: { type: String, required: false },  // Optional field for Hindi description
+        },
+        en: {
+            title: { type: String, required: false },  // Optional field for English title
+            description: { type: String, required: false },  // Optional field for English description
+        },
+    },
 });
 
 // Middleware to update updatedAt field before saving
-ProductSchema.pre('save', function(next) {
+ProductSchema.pre('save', function (next) {
     this.updatedAt = new Date();
     next();
 });
