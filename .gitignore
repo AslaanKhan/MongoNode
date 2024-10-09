@@ -1,2 +1,16 @@
-# Ignore node_modules while pushing
-"node_modules/"
+# Node.js dependencies
+node_modules/
+
+# Logs
+logs
+*.log
+
+# Environment variables
+.env
+
+# Build output
+dist/
+build/
+
+# Other files
+.DS_Store
