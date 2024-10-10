@@ -1,4 +1,3 @@
-
 import { FilterQuery, QueryOptions, UpdateQuery } from 'mongoose';
 import UserModel, { UserDocument } from '../models/user.model';
 

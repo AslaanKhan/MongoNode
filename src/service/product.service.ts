@@ -1,5 +1,4 @@
-import { Omit } from "lodash";
-import { Document, FilterQuery, QueryOptions, UpdateQuery } from "mongoose";
+import { FilterQuery, QueryOptions, UpdateQuery } from "mongoose";
 import ProductModel, { ProductDocument } from "../models/product.model";
 
 

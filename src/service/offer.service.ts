@@ -1,42 +1,30 @@
-import mongoose, { FilterQuery, UpdateQuery } from "mongoose";
+import mongoose from "mongoose";
 import OfferModel, { OfferDocument } from "../models/offer.model";
 import ProductModel from "../models/product.model";
 
-// Function to get all offers
 export async function getAllOffers() {
-    return OfferModel.find() // Populate product details
+    return OfferModel.find()
 }
 
 export async function getOfferById(Id:string) {
-    return OfferModel.findOne({_id:Id}); // Populate product details
+    return OfferModel.findOne({_id:Id});
 }
 
 export async function updateOfferAndUpdateProducts(offerId: string, offerData: OfferDocument) {
-    const session = await mongoose.startSession(); // Start a session for transaction
+    const session = await mongoose.startSession();
     session.startTransaction();
 
     try {
-        // Get the current state of the offer
         const existingOffer = await OfferModel.findById(offerId);
 
         if (!existingOffer) {
             throw new Error("Offer not found");
         }
-        
-
-        // Extract the current product IDs from the existing offer
         const currentProductIds = existingOffer.productIds.map(productOffer => productOffer.product.toString());
-
-        // Extract the new product IDs from the updated data
         const newProductIds = offerData.productIds.map(productOffer => productOffer.product.toString());
-
-        // Find products to remove the offer from (products not in the new list)
         const productsToRemoveOfferFrom = currentProductIds?.filter(productId => !newProductIds.includes(productId));
-        // console.log(currentProductIds)
-        // Find products to add the offer to (products not in the current list)
         const productsToAddOfferTo = newProductIds.filter(productId => !currentProductIds.includes(productId));
 
-        // Remove offer ID from products that are no longer in the updated offer
         if (productsToRemoveOfferFrom.length > 0) {
             await ProductModel.updateMany(
                 { _id: { $in: productsToRemoveOfferFrom } },
@@ -45,7 +33,6 @@ export async function updateOfferAndUpdateProducts(offerId: string, offerData: O
             );
         }
 
-        // Add offer ID to products that are newly added to the offer
         if (productsToAddOfferTo.length > 0) {
             await ProductModel.updateMany(
                 { _id: { $in: productsToAddOfferTo } },
@@ -54,57 +41,47 @@ export async function updateOfferAndUpdateProducts(offerId: string, offerData: O
             );
         }
 
-        // Finally, update the offer itself
         const updatedOffer = await OfferModel.findByIdAndUpdate(offerId, offerData, { new: true, session });
 
-        // Commit the transaction
         await session.commitTransaction();
         session.endSession();
 
         return updatedOffer;
     } catch (error) {
-        // If something goes wrong, abort the transaction
         await session.abortTransaction();
         session.endSession();
-        throw error; // Throw the error to handle it properly in the caller
+        throw error;
     }
 }
 
 export async function getProductNamesByIds(productIds: string[]) {
     const products = await ProductModel.find({ _id: { $in: productIds } });
-    return products.map(product => product.title); // Adjust according to your product model
+    return products.map(product => product.title);
 }
 
-// Function to create a new offer
 export async function createOfferAndUpdateProducts(offerData: OfferDocument) {
-    const session = await mongoose.startSession(); // Start a session for transaction
+    const session = await mongoose.startSession();
     session.startTransaction();
 
     try {
-        // Create the offer
         const newOffer = await OfferModel.create([offerData], { session });
-
-        // Extract the offer ID and the product IDs from the offer
         const offerId = newOffer[0]._id;
         const productIds = offerData.productIds.map(productOffer => productOffer.product);
 
-        // Update each product's offerIds field by pushing the new offer ID
         await ProductModel.updateMany(
-            { _id: { $in: productIds } }, // Find all products in the offer
-            { $addToSet: { offers: offerId } }, // Add the offer ID to each product
+            { _id: { $in: productIds } },
+            { $addToSet: { offers: offerId } },
             { session }
         );
 
-        // Commit the transaction
         await session.commitTransaction();
         session.endSession();
 
-        return newOffer[0]; // Return the newly created offer
+        return newOffer[0];
     } catch (error) {
-        // If something goes wrong, abort the transaction
         await session.abortTransaction();
         session.endSession();
-        throw error; // Throw the error to handle it properly in the caller
+        throw error;
     }
  
 }

@@ -1,7 +1,7 @@
 import { Response } from "express";
 import { FilterQuery, QueryOptions, UpdateQuery } from "mongoose";
 import OrderModel from "../models/order.model";
-import ProductModel, { ProductDocument } from "../models/product.model";
+import { ProductDocument } from "../models/product.model";
 
 
 export async function createOrder(order: any) {

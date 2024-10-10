@@ -1,27 +1,21 @@
-import { Request, Response } from "express";
 import config from "config";
-import { signJwt } from "../utils/jwt.utils";
+import { Request, Response } from "express";
 import { createSession, findSessions, updateSession } from "../service/sessionService";
-import UserModel from "../models/user.model";
+import { signJwt } from "../utils/jwt.utils";
 
 export async function createUserSessionHandler(req: Request, res: Response, user: any) {
-  // Validate the user's password
 
   if (!user) {
     return res.status(401).send("number");
   }
 
-  // create a session
   const session = await createSession(user._id, req.get("user-agent") || "");
-
-  // create an access token
 
   const accessToken = signJwt(
     { ...user, session: session._id },
     "accessTokenPrivateKey",
     { expiresIn: config.get("accessTokenTtl") } // 1yr,
   );
-  // return access & refresh tokens
 
   return accessToken ;
 }

@@ -13,7 +13,7 @@ export async function getUserCount(startDate?: string, endDate?: string) {
         };
     }
 
-    return await UserModel.countDocuments(matchCriteria);
+    return UserModel.countDocuments(matchCriteria).exec();
 }
 
 export async function getProductCount(startDate?: string, endDate?: string) {
@@ -25,7 +25,7 @@ export async function getProductCount(startDate?: string, endDate?: string) {
             $lte: new Date(endDate),
         };
     }
-    return await ProductModel.countDocuments(matchCriteria);
+    return ProductModel.countDocuments(matchCriteria).exec();
 }
 
 export async function getOrderMetrics(startDate?: string, endDate?: string) {
@@ -38,10 +38,10 @@ export async function getOrderMetrics(startDate?: string, endDate?: string) {
         };
     }
 
-    const totalOrders = await OrderModel.countDocuments(matchCriteria);
-    const completedOrders = await OrderModel.countDocuments({ ...matchCriteria, orderStatus: "completed" });
-    const pendingOrders = await OrderModel.countDocuments({ ...matchCriteria, orderStatus: "pending" });
-    const canceledOrders = await OrderModel.countDocuments({ ...matchCriteria, orderStatus: "canceled" });
+    const totalOrders = await OrderModel.countDocuments(matchCriteria).exec();
+    const completedOrders = await OrderModel.countDocuments({ ...matchCriteria, orderStatus: "completed" }).exec();
+    const pendingOrders = await OrderModel.countDocuments({ ...matchCriteria, orderStatus: "pending" }).exec();
+    const canceledOrders = await OrderModel.countDocuments({ ...matchCriteria, orderStatus: "canceled" }).exec();
 
     return {
         total: totalOrders,
@@ -67,10 +67,9 @@ export async function getAllOffers(startDate?: string, endDate?: string) {
                 _id: "$_id",
                 name: { $first: "$code" },
                 isActive: { $first: "$isActive" },
-                // revenue: { $sum: { $multiply: ["$productDetails.price", "$products.quantity"] } },
             },
         },
-    ]);
+    ]).exec();
     return offers;
 }
 
@@ -86,7 +85,7 @@ export async function getTotalRevenue(startDate?: string, endDate?: string) {
         };
     }
 
-    const orders = await OrderModel.find(matchCriteria);
+    const orders = await OrderModel.find(matchCriteria).exec();
     const totalRevenue = orders.reduce((acc, order) => acc + order.amount, 0);
 
     // Store in Redis
@@ -107,7 +106,7 @@ export async function getBestSellingProducts(startDate?: string, endDate?: strin
         };
     }
 
-    const orders = await OrderModel.aggregate([
+    const bestSelling = await OrderModel.aggregate([
         { $match: matchCriteria },
         { $unwind: "$products" },
         {
@@ -129,9 +128,12 @@ export async function getBestSellingProducts(startDate?: string, endDate?: strin
         },
         { $sort: { totalSold: -1 } },
         { $limit: 10 },
-    ]);
+        {
+            $project: { _id: 1, name: 1, totalSold: 1, revenue: 1 }, // Limit projection
+        },
+    ]).exec();
 
-    return orders;
+    return bestSelling;
 }
 
 export async function getTopCustomers(startDate?: string, endDate?: string) {
@@ -168,7 +170,7 @@ export async function getTopCustomers(startDate?: string, endDate?: string) {
         },
         { $sort: { totalSpent: -1 } },
         { $limit: 10 },
-    ]);
+    ]).exec();
 
     return topCustomers;
 }

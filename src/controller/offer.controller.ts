@@ -35,14 +35,12 @@ export async function updateOfferByIdHandler(req: Request, res: Response) {
     const offerId = req.params.offerId;
     const updateData = req.body;
 
-    // Check if the offer exists
     const offerExist = await getOfferById(offerId);
     if (!offerExist) {
         return res.status(404).send({ message: "Offer not found" });
     }
 
     try {
-        // Call the updated service to handle the offer update and product updates
         const updatedOffer = await updateOfferAndUpdateProducts(offerId, updateData);
         return res.send({ status: "200", message: "Offer Updated", offer: updatedOffer });
     } catch (error:any) {
