@@ -7,20 +7,20 @@ import { translateText } from "../utils/translate";
 export async function createProductHandler(req: Request<{}, {}, CreateProductInput["body"]>, res: Response) {
     const body = req.body
     const user = await UserModel.findOne({ _id: res?.locals?.user?._doc?._id })
-    const translatedTitle = await translateText(body?.title);
-    const translatedDescription = await translateText(body?.description);
+    // const translatedTitle = await translateText(body?.title);
+    // const translatedDescription = await translateText(body?.description);
     // if (!user?.isAdmin) {
     //     return res.send({ status: 200, message: "User not admin" })
     // }
     try {
         const product = await createProduct({
             ...body, 
-            translations: {
-                hi: {
-                    title: translatedTitle?.translatedText,
-                    description: translatedDescription?.translatedText,
-                }
-            }
+            // translations: {
+            //     hi: {
+            //         title: translatedTitle?.translatedText,
+            //         description: translatedDescription?.translatedText,
+            //     }
+            // }
         })
         return res.send({ status: "200", message: "Product Created", product })
     } catch (error) {
