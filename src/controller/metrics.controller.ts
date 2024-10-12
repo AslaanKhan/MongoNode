@@ -4,9 +4,11 @@ import {
     getBestSellingProducts,
     getOrderMetrics,
     getProductCount,
+    getProductDataByDateRange,
     getTopCustomers,
     getTotalRevenue,
-    getUserCount
+    getUserCount,
+    getUserDataByDateRange
 } from "../service/metric.service";
 
 export async function getMetricsHandler(req: Request, res: Response) {
@@ -22,7 +24,7 @@ export async function getMetricsHandler(req: Request, res: Response) {
         // }
 
         // Fetch metrics concurrently
-        const [userCount, productCount, orderMetrics, offer, totalRevenue, bestSelling, topCustomers] = await Promise.all([
+        const [userCount, productCount, orderMetrics, offer, totalRevenue, bestSelling, topCustomers, userMetricsByDate, productMetricsByDate] = await Promise.all([
             getUserCount(start, end),
             getProductCount(start, end),
             getOrderMetrics(start, end),
@@ -30,6 +32,8 @@ export async function getMetricsHandler(req: Request, res: Response) {
             getTotalRevenue(start, end),
             getBestSellingProducts(start, end),
             getTopCustomers(start, end),
+            getUserDataByDateRange(start, end),
+            getProductDataByDateRange(start, end),
         ]);
 
         const metrics = {
@@ -40,6 +44,8 @@ export async function getMetricsHandler(req: Request, res: Response) {
             totalRevenue,
             bestSelling,
             topCustomers,
+            userMetricsByDate,
+            productMetricsByDate
         };
 
         // Store in Redis with expiration of 5 minutes

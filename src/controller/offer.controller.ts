@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import UserModel from "../models/user.model";
 import { deleteCategory } from "../service/category.service";
-import { createOfferAndUpdateProducts, getAllOffers, getOfferById, updateOfferAndUpdateProducts } from "../service/offer.service";
+import { createOfferAndUpdateProducts, getAllOffers, getOfferById, toggleOffer, updateOfferAndUpdateProducts } from "../service/offer.service";
 
 export async function createOfferHandler(req: Request, res: Response) {
     const body = req.body
@@ -48,6 +48,17 @@ export async function updateOfferByIdHandler(req: Request, res: Response) {
     }
 }
 
+export async function toggleOfferHandler(req:Request, res:Response) {    
+    const offerId = req.params.offerId;
+    const updateData = req.body;
+
+    try {
+        const updatedOffer = await toggleOffer(offerId, updateData);
+        return res.send({ status: "200", message: "Offer Updated", offer: updatedOffer });
+    } catch (error:any) {
+        return res.status(500).send({ status: "500", message: "Error updating offer", error: error.message });
+    }
+}
 
 export async function deleteCategoryHandler(req: Request, res: Response) {
     const categoryId = req.params.categoryId

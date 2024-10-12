@@ -1,8 +1,8 @@
 import { Express, Request, Response } from "express";
 import { createCategorytHandler, deleteCategoryHandler, getCategoriesHandler, updateCategoriesHandler } from "./controller/category.controller";
 import { getMetricsHandler } from "./controller/metrics.controller";
-import { createOfferHandler, getAllOffersHandler, getOfferByIdHandler, updateOfferByIdHandler } from "./controller/offer.controller";
-import { cancelOrderHandler, createOrdertHandler, getOrderByIdHandler, getOrdersByUserIdHandler, updateOrdertHandler } from "./controller/order.controller";
+import { createOfferHandler, getAllOffersHandler, getOfferByIdHandler, toggleOfferHandler, updateOfferByIdHandler } from "./controller/offer.controller";
+import { cancelOrderHandler, createOrdertHandler, getAllOrdersHandler, getOrderByIdHandler, getOrdersByUserIdHandler, updateOrdertHandler } from "./controller/order.controller";
 import { createProductHandler, deleteProductHandler, getProductByCategoryHandler, getProductByIdHandler, getProductHandler, updateProductHandler } from "./controller/product.controller";
 import { deleteSessionHandler, getUserSessionsHandler } from "./controller/sessionController";
 import { adminLoginHandler, createOrGetUserHandler, getAllUsershandler, getUserByIdHandler } from "./controller/user.controller";
@@ -43,15 +43,17 @@ function routes(app: Express) {
 
     //orders
     app.post("/api/order", createOrdertHandler) // create order
-    app.post("/api/updateorder", requireUser, updateOrdertHandler) // update order
-    app.get("/api/order", getOrdersByUserIdHandler) // get all user order
-    app.get("/api/order/:orderId", requireUser, getOrderByIdHandler) // get order by id
+    app.post("/api/order/:orderId", updateOrdertHandler) // update order
+    app.get("/api/order", getAllOrdersHandler) // update order
+    app.get("/api/order/:userId", getOrdersByUserIdHandler) // get all user order
+    app.get("/api/orders/:orderId", getOrderByIdHandler) // get order by id
     app.delete("/api/order/:orderId", requireUser, cancelOrderHandler) // cancel order
     
 
     //offers
     app.post("/api/offers", createOfferHandler)
     app.post("/api/offers/:offerId", updateOfferByIdHandler)
+    app.post("/api/offer/:offerId", toggleOfferHandler)
     app.get("/api/offers", getAllOffersHandler)
     app.get("/api/offers/:offerId", getOfferByIdHandler)
 

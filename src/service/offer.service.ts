@@ -54,6 +54,24 @@ export async function updateOfferAndUpdateProducts(offerId: string, offerData: O
     }
 }
 
+export async function toggleOffer(offerId: string, offerData: OfferDocument) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    console.log(offerData)
+    try {
+        const updatedOffer = await OfferModel.findByIdAndUpdate(offerId, offerData, { new: true, session });
+
+        await session.commitTransaction();
+        session.endSession();
+
+        return updatedOffer;
+    } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
+        throw error;
+    }
+}
+
 export async function getProductNamesByIds(productIds: string[]) {
     const products = await ProductModel.find({ _id: { $in: productIds } });
     return products.map(product => product.title);
