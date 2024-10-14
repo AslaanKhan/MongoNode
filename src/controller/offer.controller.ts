@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import UserModel from "../models/user.model";
-import { deleteCategory } from "../service/category.service";
-import { createOfferAndUpdateProducts, getAllOffers, getOfferById, toggleOffer, updateOfferAndUpdateProducts } from "../service/offer.service";
+import { createOfferAndUpdateProducts, deleteOffer, getAllOffers, getOfferById, toggleOffer, updateOfferAndUpdateProducts } from "../service/offer.service";
 
 export async function createOfferHandler(req: Request, res: Response) {
     const body = req.body
@@ -35,11 +34,6 @@ export async function updateOfferByIdHandler(req: Request, res: Response) {
     const offerId = req.params.offerId;
     const updateData = req.body;
 
-    const offerExist = await getOfferById(offerId);
-    if (!offerExist) {
-        return res.status(404).send({ message: "Offer not found" });
-    }
-
     try {
         const updatedOffer = await updateOfferAndUpdateProducts(offerId, updateData);
         return res.send({ status: "200", message: "Offer Updated", offer: updatedOffer });
@@ -60,8 +54,12 @@ export async function toggleOfferHandler(req:Request, res:Response) {
     }
 }
 
-export async function deleteCategoryHandler(req: Request, res: Response) {
-    const categoryId = req.params.categoryId
-    await deleteCategory({ _id: categoryId })
-    return res.send({ status: "200", message: "Category deleted" })
+export async function deleteOfferHandler(req:Request, res:Response) {
+    const offerId = req.params.offerId;
+    try {
+        const deletedOffer = await deleteOffer(offerId);
+        return res.send({ status: "200", message: "Offer deleted", offer: deletedOffer });
+    } catch (error:any) {
+        return res.status(500).send({ status: "500", message: "Error deleting offer", error: error.message });
+    }
 }

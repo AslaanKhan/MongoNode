@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import OfferModel, { OfferDocument } from "../models/offer.model";
 import ProductModel from "../models/product.model";
+import c from "config";
 
 export async function getAllOffers() {
     return OfferModel.find()
@@ -20,27 +21,84 @@ export async function updateOfferAndUpdateProducts(offerId: string, offerData: O
         if (!existingOffer) {
             throw new Error("Offer not found");
         }
+
         const currentProductIds = existingOffer.productIds.map(productOffer => productOffer.product.toString());
         const newProductIds = offerData.productIds.map(productOffer => productOffer.product.toString());
-        const productsToRemoveOfferFrom = currentProductIds?.filter(productId => !newProductIds.includes(productId));
-        const productsToAddOfferTo = newProductIds.filter(productId => !currentProductIds.includes(productId));
+        
+        const productsToRemoveOfferFrom = currentProductIds.filter(productId => !newProductIds.includes(productId));
+        const productsToAddOfferTo = newProductIds;
 
         if (productsToRemoveOfferFrom.length > 0) {
-            await ProductModel.updateMany(
-                { _id: { $in: productsToRemoveOfferFrom } },
-                { $pull: { offers: offerId } },
-                { session }
-            );
+            const products = await ProductModel.find({ _id: { $in: productsToRemoveOfferFrom } });
+            for (const product of products) {
+                let finalPrice = product.sellingPrice;
+                
+                const productOffer = existingOffer.productIds.find(po => po.product.toString() === product._id.toString());
+                
+                if (productOffer) {
+                    const { discountPercentage, flatDiscount } = offerData;
+                    
+                    if (flatDiscount && flatDiscount > 0) {
+                        finalPrice += flatDiscount;
+                    }
+
+                    if (discountPercentage && discountPercentage > 0) {
+                        const discountAmount = (product.price * discountPercentage) / 100;
+                        finalPrice += discountAmount;
+                    }
+
+                    finalPrice = Math.round(Math.max(finalPrice, 0));
+
+                    await ProductModel.updateOne(
+                        { _id: product._id },
+                        { 
+                            $pull: { offers: offerId },
+                            $set: {
+                                sellingPrice: finalPrice,
+                            }
+                        },
+                        { session }
+                    );
+                }
+            }
         }
 
         if (productsToAddOfferTo.length > 0) {
-            await ProductModel.updateMany(
-                { _id: { $in: productsToAddOfferTo } },
-                { $addToSet: { offers: offerId } },
-                { session }
-            );
+            const products = await ProductModel.find({ _id: { $in: productsToAddOfferTo } });
+            for (const product of products) {
+                let finalPrice = product.sellingPrice || product.price;
+                
+                const productOffer = offerData.productIds.find(po => po.product.toString() === product._id.toString());
+                
+                if (productOffer) {
+                    const { discountPercentage, flatDiscount } = offerData;
+                    
+                    if (flatDiscount && flatDiscount > 0) {
+                        finalPrice -= flatDiscount;
+                    }
+
+                    if (discountPercentage && discountPercentage > 0) {
+                        const discountAmount = (product.price * discountPercentage) / 100;
+                        finalPrice -= discountAmount;
+                    }
+
+                    finalPrice = Math.round(Math.max(finalPrice, 0));
+
+                    await ProductModel.updateOne(
+                        { _id: product._id },
+                        {
+                            $addToSet: { offers: offerId },
+                            $set: {
+                                sellingPrice: finalPrice,
+                            }
+                        },
+                        { session }
+                    );
+                }
+            }
         }
 
+        // Finally, update the offer details
         const updatedOffer = await OfferModel.findByIdAndUpdate(offerId, offerData, { new: true, session });
 
         await session.commitTransaction();
@@ -54,12 +112,65 @@ export async function updateOfferAndUpdateProducts(offerId: string, offerData: O
     }
 }
 
-export async function toggleOffer(offerId: string, offerData: OfferDocument) {
+export async function toggleOffer(offerId: string, toggleValue: Partial<OfferDocument>) {
     const session = await mongoose.startSession();
     session.startTransaction();
-    console.log(offerData)
+
+    const offerData = await OfferModel.findById(offerId);
     try {
-        const updatedOffer = await OfferModel.findByIdAndUpdate(offerId, offerData, { new: true, session });
+        const currentProductIds = offerData.productIds.map(productOffer => productOffer.product.toString());
+        const products = await ProductModel.find({ _id: { $in: currentProductIds } });
+        for (const product of products) {
+            let finalPrice = product.sellingPrice;
+            
+            const productOffer = offerData.productIds.find(po => po.product.toString() === product._id.toString());
+            
+            if (productOffer) {
+                const { discountPercentage, flatDiscount } = offerData;
+                if (flatDiscount && flatDiscount > 0) {
+                    if(toggleValue.isActive){
+                        finalPrice -= flatDiscount;
+                    }else{
+                        finalPrice += flatDiscount;
+                    }
+                }
+
+                if (discountPercentage && discountPercentage > 0) {
+                    const discountAmount = (product.price * discountPercentage) / 100;
+                    if(toggleValue.isActive){
+                        finalPrice -= discountAmount;
+                    }else{
+                        finalPrice += discountAmount;
+                    }
+                }
+
+                finalPrice = Math.round(Math.max(finalPrice, 0));
+                if(toggleValue.isActive){
+                    await ProductModel.updateOne(
+                        { _id: product._id },
+                        { 
+                            $addToSet: { offers: offerId },
+                            $set: {
+                                sellingPrice: finalPrice,
+                            }
+                        },
+                        { session }
+                    );
+                }else{
+                    await ProductModel.updateOne(
+                        { _id: product._id },
+                        { 
+                            $pull: { offers: offerId },
+                            $set: {
+                                sellingPrice: finalPrice,
+                            }
+                        },
+                        { session }
+                    );
+                }
+            }
+        }
+        const updatedOffer = await OfferModel.findByIdAndUpdate(offerId, toggleValue, { new: true, session });
 
         await session.commitTransaction();
         session.endSession();
@@ -72,9 +183,20 @@ export async function toggleOffer(offerId: string, offerData: OfferDocument) {
     }
 }
 
-export async function getProductNamesByIds(productIds: string[]) {
-    const products = await ProductModel.find({ _id: { $in: productIds } });
-    return products.map(product => product.title);
+export async function deleteOffer(offerId: string) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    try {
+        await toggleOffer(offerId, { isActive: false });
+        await OfferModel.findByIdAndDelete(offerId, { session });
+        await session.commitTransaction();
+        session.endSession();
+        return true;
+    }catch (error) {
+        await session.abortTransaction();
+        session.endSession();
+        throw error;
+    }
 }
 
 export async function createOfferAndUpdateProducts(offerData: OfferDocument) {
@@ -85,12 +207,39 @@ export async function createOfferAndUpdateProducts(offerData: OfferDocument) {
         const newOffer = await OfferModel.create([offerData], { session });
         const offerId = newOffer[0]._id;
         const productIds = offerData.productIds.map(productOffer => productOffer.product);
+        const products = await ProductModel.find({ _id: { $in: productIds } });
 
-        await ProductModel.updateMany(
-            { _id: { $in: productIds } },
-            { $addToSet: { offers: offerId } },
-            { session }
-        );
+        for (const product of products) {
+            let finalPrice = product.price; // Base price without discount
+
+            // Check if the offer has a percentage or flat discount
+            const productOffer = offerData.productIds.find(po => po.product.toString() === product._id.toString());
+            if (productOffer) {
+                const { discountPercentage, flatDiscount } = offerData; 
+
+                if (flatDiscount) {
+                    finalPrice -= flatDiscount;
+                }
+
+                if (discountPercentage) {
+                    const discountAmount = (product.price * discountPercentage) / 100;
+                    finalPrice -= discountAmount;
+                }
+
+                finalPrice = Math.max(finalPrice, 0);
+
+                await ProductModel.updateOne(
+                    { _id: product._id },
+                    {
+                        $addToSet: { offers: offerId },
+                        $set: {
+                            sellingPrice: finalPrice,
+                        }
+                    },
+                    { session }
+                );
+            }
+        }
 
         await session.commitTransaction();
         session.endSession();
@@ -103,49 +252,3 @@ export async function createOfferAndUpdateProducts(offerData: OfferDocument) {
     }
  
 }
-
-// Function to calculate the final price after applying offers
-// async function calculateFinalPrice(productId: string, quantity: number) {
-//     const product = await ProductModel.findById(productId).populate<{ offerIds: OfferDocument[] }>('offerIds');
-    
-//     if (product) {
-//         let finalPrice = product.price * quantity; // Base price without discount
-
-//         // Check for applicable offers
-//         const applicableOffers = product.offerIds.filter(offer => 
-//             offer.isActive && 
-//             new Date() >= offer.startDate && 
-//             new Date() <= offer.endDate
-//         );
-
-//         applicableOffers.forEach(offer => {
-//             // Check if conditions are met for the offer
-//             const productOffer = offer.productIds.find(productOffer => productOffer.product.toString() === productId);
-//             if (productOffer) {
-//                 const { conditions, discountPercentage, flatDiscount } = productOffer;
-
-//                 // Handle conditions and discounts
-//                 if (conditions && conditions.minQuantity && quantity >= conditions.minQuantity) {
-//                     // Apply discount per value if it exists
-//                     if (conditions.discountPerVal) {
-//                         const discount = conditions.discountPerVal * (quantity - conditions.minQuantity);
-//                         finalPrice -= discount; // Apply discount
-//                     }
-//                 }
-                
-//                 // Apply flat discount if specified
-//                 if (flatDiscount) {
-//                     finalPrice -= flatDiscount;
-//                 }
-
-//                 // Apply percentage discount if specified
-//                 if (discountPercentage) {
-//                     const discountAmount = (finalPrice * discountPercentage) / 100;
-//                     finalPrice -= discountAmount;
-//                 }
-//             }
-//         });
-
-//         return finalPrice;
-//     }
-// }

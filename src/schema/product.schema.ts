@@ -24,6 +24,9 @@ const payload = {
         price: number({
             required_error: "Price is required"
         }),
+        sellingpPrice: number({
+            required_error: "Price is required"
+        }),
         description: string({
             required_error: "Description is required"
         }),

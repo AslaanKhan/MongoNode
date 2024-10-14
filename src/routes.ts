@@ -1,7 +1,7 @@
 import { Express, Request, Response } from "express";
 import { createCategorytHandler, deleteCategoryHandler, getCategoriesHandler, updateCategoriesHandler } from "./controller/category.controller";
 import { getMetricsHandler } from "./controller/metrics.controller";
-import { createOfferHandler, getAllOffersHandler, getOfferByIdHandler, toggleOfferHandler, updateOfferByIdHandler } from "./controller/offer.controller";
+import { createOfferHandler, deleteOfferHandler, getAllOffersHandler, getOfferByIdHandler, toggleOfferHandler, updateOfferByIdHandler } from "./controller/offer.controller";
 import { cancelOrderHandler, createOrdertHandler, getAllOrdersHandler, getOrderByIdHandler, getOrdersByUserIdHandler, updateOrdertHandler } from "./controller/order.controller";
 import { createProductHandler, deleteProductHandler, getProductByCategoryHandler, getProductByIdHandler, getProductHandler, updateProductHandler } from "./controller/product.controller";
 import { deleteSessionHandler, getUserSessionsHandler } from "./controller/sessionController";
@@ -56,6 +56,7 @@ function routes(app: Express) {
     app.post("/api/offer/:offerId", toggleOfferHandler)
     app.get("/api/offers", getAllOffersHandler)
     app.get("/api/offers/:offerId", getOfferByIdHandler)
+    app.delete("/api/offers/:offerId", deleteOfferHandler)
 
     //metrics
     app.get("/api/metrics", getMetricsHandler);
